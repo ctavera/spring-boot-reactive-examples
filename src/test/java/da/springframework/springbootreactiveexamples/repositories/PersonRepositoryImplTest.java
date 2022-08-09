@@ -70,4 +70,39 @@ class PersonRepositoryImplTest {
             list.forEach(person -> System.out.println(person.toString()));
         });
     }
+
+    @Test
+    void testFindPersonById() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 3;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).next();
+
+        personMono.subscribe(person -> System.out.println(person.toString()));
+    }
+
+    @Test
+    void testFindPersonByIdNotFound() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 8;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).next();
+
+        personMono.subscribe(person -> System.out.println(person.toString()));
+    }
+
+    @Test
+    void testFindPersonByIdNotFoundWithException() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 8;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).single();
+
+        personMono.doOnError(throwable -> System.out.println(throwable.getMessage()))
+                .onErrorReturn(Person.builder().build())
+                .subscribe(person -> System.out.println(person.toString()));
+    }
 }
