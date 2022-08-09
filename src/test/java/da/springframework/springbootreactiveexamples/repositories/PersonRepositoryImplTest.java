@@ -28,7 +28,15 @@ class PersonRepositoryImplTest {
 
     @Test
     void getByIdSubscribe() {
-        Mono<Person> personMono = personRepository.getById(1);
+        Mono<Person> personMono = personRepository.getById(2);
+
+        personMono.subscribe(person -> System.out.println(person.toString()));
+    }
+
+    @Test
+    void testGetByIdSubscribeNotFound() {
+
+        Mono<Person> personMono = personRepository.getById(9);
 
         personMono.subscribe(person -> System.out.println(person.toString()));
     }
@@ -88,7 +96,7 @@ class PersonRepositoryImplTest {
 
         final Integer id = 8;
 
-        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).next();
+        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).next(); //no exception, return empty Mono if not found
 
         personMono.subscribe(person -> System.out.println(person.toString()));
     }
@@ -99,7 +107,7 @@ class PersonRepositoryImplTest {
 
         final Integer id = 8;
 
-        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).single();
+        Mono<Person> personMono = personFlux.filter(person -> person.getId() == id).single();  //if not found, throw an exception
 
         personMono.doOnError(throwable -> System.out.println(throwable.getMessage()))
                 .onErrorReturn(Person.builder().build())
